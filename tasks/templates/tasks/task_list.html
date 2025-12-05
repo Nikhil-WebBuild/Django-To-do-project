@@ -1,0 +1,65 @@
+<!-- Extend from base template to get header, footer, and styling -->
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h2>All Tasks</h2>
+    <p class="subtitle">Manage your tasks and stay organized!</p>
+</div>
+
+<!-- Check if there are any tasks -->
+{% if tasks %}
+<div class="tasks-grid">
+    <!-- Loop through each task and display it -->
+    {% for task in tasks %}
+    <div class="task-card status-{{ task.status }}">
+        <div class="task-header">
+            <h3>{{ task.title }}</h3>
+            <!-- Show status badge -->
+            <span class="status-badge {{ task.status }}">
+                {{ task.get_status_display }}
+            </span>
+        </div>
+
+        <!-- Task description -->
+        {% if task.description %}
+        <p class="task-description">{{ task.description }}</p>
+        {% endif %}
+
+        <!-- Deadline information -->
+        {% if task.deadline %}
+        <div class="task-deadline">
+            <strong>⏰ Deadline:</strong>
+            {{ task.deadline|date:"F d, Y - g:i A" }}
+        </div>
+        {% endif %}
+
+        <!-- Action buttons -->
+        <div class="task-actions">
+            <!-- Edit button -->
+            <a href="{% url 'update_task' task.id %}" class="btn btn-edit">✏️ Edit</a>
+
+            <!-- Delete button with form for POST request -->
+            <form method="POST" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-delete">🗑️ Delete</button>
+            </form>
+        </div>
+
+        <!-- Show when task was created -->
+        <div class="task-footer">
+            <small>Created: {{ task.created_at|date:"M d, Y" }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Show this message if no tasks exist -->
+<div class="empty-state">
+    <h3>📋 No tasks yet!</h3>
+    <p>Start by adding your first task to get organized.</p>
+    <a href="{% url 'add_task' %}" class="btn btn-primary-large">+ Add Your First Task</a>
+</div>
+{% endif %}
+
+{% endblock %}

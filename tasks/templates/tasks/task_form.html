@@ -1,0 +1,57 @@
+<!-- Extend from base template -->
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ action }} Task</h2>
+</div>
+
+<div class="form-container">
+    <!-- Form to add or edit a task -->
+    <form method="POST" class="task-form">
+        <!-- CSRF token is required for security in Django forms -->
+        {% csrf_token %}
+        
+        <!-- Task Title Field -->
+        <div class="form-group">
+            <label for="title">Task Title *</label>
+            <input type="text" id="title" name="title" value="{% if task %}{{ task.title }}{% endif %}" placeholder="Enter task title" required maxlength="200">
+            <small>Maximum 200 characters</small>
+        </div>
+        
+        <!-- Task Description Field -->
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="5" placeholder="Enter task description (optional)">{% if task %}{{ task.description }}{% endif %}</textarea>
+        </div>
+        
+        <!-- Deadline Field -->
+        <div class="form-group">
+            <label for="deadline">Deadline</label>
+            <input type="datetime-local" id="deadline" name="deadline" {% if task %}{% if task.deadline %}value="{{ task.deadline|date:'Y-m-dTH:i' }}"{% endif %}{% endif %}>
+            <small>Optional - Select date and time</small>
+        </div>
+        
+        <!-- Status Field -->
+        <div class="form-group">
+            <label for="status">Status *</label>
+            <select id="status" name="status" required>
+                <!-- Loop through all status choices -->
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if task %}{% if task.status == value %}selected{% endif %}{% else %}{% if value == 'pending' %}selected{% endif %}{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Form Buttons -->
+        <div class="form-actions">
+            <!-- Cancel button goes back to task list -->
+            <a href="{% url 'task_list' %}" class="btn btn-cancel">Cancel</a>
+            
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-submit">{% if action == 'Add' %}➕ Add Task{% else %}💾 Save Changes{% endif %}</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
